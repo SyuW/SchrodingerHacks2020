@@ -20,23 +20,27 @@ class Molecule():
 
         if dist > 0.1:
             self.temp.remove()
-            self.fig.canvas.draw_idle()
             self.curr_pos += self.displ * self.speed
             self.temp, = plt.plot(*self.curr_pos, 'ro') 
         
         else:
             self.next_pos = self.find_next_position()
             self.displ = self.next_pos - self.curr_pos
-
-    def excited_state(self):
-        self.speed = 3
-
-    def __init__(self, excited):
-        self.fig = plt.figure()
+    
+    def animate(self):
         self.ax = self.fig.add_axes([0, 0, 1, 1], frameon=True)
         
-        self.ax.set_xlim(-2, 2)
-        self.ax.set_ylim(-2, 2)
+        self.ax.set_xlim(-1, 1)
+        self.ax.set_ylim(-1, 1)
+
+        self.temp, = plt.plot(*self.curr_pos, 'ro')
+        animation = FuncAnimation(self.fig, self.update, interval=1)
+        plt.show()
+    
+    def construct_fig(self):
+        self.fig = plt.figure()
+
+    def __init__(self, excited):
 
         self.curr_pos = np.array([0., 0.])
         self.next_pos = np.array([0., 0.])
@@ -49,10 +53,8 @@ class Molecule():
             self.rmax = GROUND_STATE_MAX_RADIUS
             self.speed = GROUND_SPEED
 
-        self.temp, = plt.plot(*self.curr_pos, 'ro') 
-        animation = FuncAnimation(self.fig, self.update, interval=1)
-        plt.show()
-
 
 if __name__ == "__main__":
-    foo = Molecule(excited=True)
+    m = Molecule(excited=True)
+    m.construct_fig()
+    m.animate()
