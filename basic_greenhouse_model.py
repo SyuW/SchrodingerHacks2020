@@ -11,7 +11,7 @@ See: http://www.realclimate.org/index.php/archives/2007/04/learning-from-a-simpl
 Extensions for introducing realism/complexity:
 - feedback mechanisms for albedo and atmospheric emissivity
 - Atmospheric convection
-- Clouds; condensation of water vapour into droplets releases latent energy into atmosphere
+- Clouds; condensation of water vapour into droplets releases latent energy into atmosphere and scatter radiation
 - Multi-layer representation of atmosphere
 '''
 
