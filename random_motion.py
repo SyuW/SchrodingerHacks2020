@@ -26,6 +26,9 @@ class Molecule():
         else:
             self.next_pos = self.find_next_position()
             self.displ = self.next_pos - self.curr_pos
+
+    def photon_event(self):
+        self.excited = True
         
     def set_state(self):
         if self.excited:
@@ -37,7 +40,7 @@ class Molecule():
     
     def animate_molecule(self):
         self.temp, = plt.plot(*self.curr_pos, 'ro')
-        animation = FuncAnimation(self._fig, self.update_molecule, interval=1)
+        ani = FuncAnimation(self._fig, self.update_molecule, interval=10)
         plt.show()
     
     def construct_fig_axes(self):
@@ -49,7 +52,7 @@ class Molecule():
 
     def __init__(self):
 
-        self.excited = True
+        self.excited = False
         self.set_state()
 
         self.curr_pos = np.array([0., 0.])
