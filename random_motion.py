@@ -32,7 +32,7 @@ class Molecule():
 
     def photon_event(self):
         self.excited = True
-        self.curr_pos = np.array([0, 0])
+        self.curr_pos = np.array([0., 0.])
         self.next_pos = np.array([0., 0.])
         self.displ = self.curr_pos - self.next_pos
         
