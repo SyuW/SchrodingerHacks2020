@@ -11,7 +11,7 @@ MOLECULE_TYPES_TO_COLORS = {"CO2": "r", "H2O": "cornflowerblue", "CH4": "k", "N2
 class Molecule():
 
     def find_next_position(self):
-        # Sample random values of r and theta, so that molecule stays in circular region
+        # Sample random polar coords, so that molecule stays in circular region
         r = np.random.uniform(0, self.rmax)
         theta = np.random.uniform(0, 2*np.pi)
 
@@ -32,6 +32,7 @@ class Molecule():
 
     def photon_event(self):
         self.excited = True
+        
         self.curr_pos = np.array([0., 0.])
         self.next_pos = np.array([0., 0.])
         self.displ = self.curr_pos - self.next_pos

@@ -21,9 +21,9 @@ class Photon(Molecule):
     def select_molecule_for_excitation(self):
         return
 
-    def detected_collision(self):
-
-        if self.hit_grid:
+    def address_collision(self):
+        if self.hit_molecule:
+            # Set transmission/absorption probability based on real data later
             self.be_absorbed = bool(np.random.randint(0, 2))
             if self.be_absorbed:
                 self.destroy = True
@@ -32,10 +32,13 @@ class Photon(Molecule):
         else:
             self.destroy = True
 
+    def update_photon(self, i):
+        self.update_molecule(i)
+
     def animate_just_photon(self):
         self.create_figure_axes()
         self.temp, = plt.plot(*self.curr_pos, color=self.m_color, marker='o')
-        ani = FuncAnimation(self.fig, self.update_molecule, interval=10)
+        ani = FuncAnimation(self.fig, self.update_photon, interval=10)
         plt.show()
 
     def __init__(self):
@@ -46,7 +49,9 @@ class Photon(Molecule):
         self.next_pos   = np.array([np.random.uniform(0.1, 0.9), 1.0])
         self.displ      = self.next_pos - self.curr_pos
 
-        self.hit_grid = False
+        # Initialize collision detection and destruction params
+        self.hit_polygon = False
+        self.hit_molecule = False
         self.destroy = False
 
         self.speed = 0.01
@@ -57,6 +62,7 @@ class Photon(Molecule):
 class MolecularView():
 
     def render_molecules(self):
+        # Prepare all molecules' axes
         for i, ax in enumerate(self.axs):
             m = self.ms[i]
             plt.sca(ax)
@@ -64,23 +70,33 @@ class MolecularView():
             ax.set_ylim(-1, 1)
             plt.axis("off")
             m.temp, = plt.plot(*m.curr_pos, color=m.m_color, marker='o')
+        # Prepare the photon's axes
+        plt.sca(self.photon_axes)
+        self.p.temp, = plt.plot(*self.p.curr_pos, color=self.p.m_color, marker='o')
         
-        ani = FuncAnimation(self.fig, self.update_all_molecules, interval=10)
+        ani = FuncAnimation(self.fig, self.update_all_molecules, interval=5)
         plt.show()
 
     # Updates the positions of all molecules in grid
     def update_all_molecules(self, i):
+        # Update the grid molecule positions
         for i, ax in enumerate(self.axs):
             plt.sca(ax)
             m = (self.ms)[i]
             m.update_molecule(i)
+        # Update photon's position
+        plt.sca(self.photon_axes)
+        self.p.update_photon(i)
 
     def __init__(self, num_molecules):
         self.fig, self.axs = plt.subplots(nrows=1, ncols=num_molecules)
         self.fig.patch.set_visible(False)
         self.ms = [Molecule() for _ in self.axs]
 
-        self.photon_axis = self.fig.add_subplot(111)
+        self.p = Photon()
+        self.photon_axes = self.fig.add_subplot(111)
+        self.photon_axes.set_xlim(0, 1)
+        self.photon_axes.set_ylim(0, 1)
         plt.axis("off")
 
         self.render_molecules()
