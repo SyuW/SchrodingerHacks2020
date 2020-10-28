@@ -3,33 +3,39 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-GROUND_STATE_MAX_RADIUS = 0.2; EXCITED_STATE_MAX_RADIUS = 0.5
-GROUND_SPEED = 0.1; EXCITED_SPEED = 0.2
-MOLECULE_TYPES_TO_COLORS = {"CO2": "r", "H2O": "cornflowerblue", "CH4": "k"}
+GROUND_STATE_MAX_RADIUS = 0.15; EXCITED_STATE_MAX_RADIUS = 0.3
+GROUND_SPEED = 0.1; EXCITED_SPEED = 0.15
+MOLECULE_TYPES_TO_COLORS = {"CO2": "r", "H2O": "cornflowerblue", "CH4": "k", "N2O": "m"}
+FIN_DIST_TOLERANCE = 0.1
 
 
 class Molecule():
 
     def find_next_position(self):
+        # Sample random values of r and theta, so that molecule stays in circular region
         r = np.random.uniform(0, self.rmax)
         theta = np.random.uniform(0, 2*np.pi)
 
         return np.array([r*np.cos(theta), r*np.sin(theta)])
 
     def update_molecule(self, i):
+        # If not reached yet, move towards next position
         dist = np.linalg.norm(self.curr_pos - self.next_pos)
-
-        if dist > 0.1:
+        if dist > FIN_DIST_TOLERANCE:
             self.temp.remove()
             self.curr_pos += self.displ * self.speed
             self.temp, = plt.plot(*self.curr_pos, color=self.m_color, marker='o') 
         
+        # If reached next position, set new position and determine displacement
         else:
             self.next_pos = self.find_next_position()
             self.displ = self.next_pos - self.curr_pos
 
     def photon_event(self):
         self.excited = True
+        self.curr_pos = np.array([0, 0])
+        self.next_pos = np.array([0., 0.])
+        self.displ = self.curr_pos - self.next_pos
         
     def set_state(self):
         if self.excited:
@@ -52,11 +58,12 @@ class Molecule():
         self._ax.set_ylim(-1, 1)
 
     def __init__(self):
-        
-        self.m_color = MOLECULE_TYPES_TO_COLORS['H2O']
-        self.excited = False
+
+        self.m_color = MOLECULE_TYPES_TO_COLORS['N2O']
+        self.excited = True
         self.set_state()
 
+        # Initialize position variables to origin
         self.curr_pos = np.array([0., 0.])
         self.next_pos = np.array([0., 0.])
         self.displ = self.curr_pos - self.next_pos
