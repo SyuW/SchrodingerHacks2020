@@ -5,6 +5,7 @@ import numpy as np
 
 GROUND_STATE_MAX_RADIUS = 0.2; EXCITED_STATE_MAX_RADIUS = 0.5
 GROUND_SPEED = 0.1; EXCITED_SPEED = 0.2
+MOLECULE_TYPES_TO_COLORS = {"CO2": "r", "H2O": "cornflowerblue", "CH4": "k"}
 
 
 class Molecule():
@@ -21,7 +22,7 @@ class Molecule():
         if dist > 0.1:
             self.temp.remove()
             self.curr_pos += self.displ * self.speed
-            self.temp, = plt.plot(*self.curr_pos, 'ro') 
+            self.temp, = plt.plot(*self.curr_pos, color=self.m_color, marker='o') 
         
         else:
             self.next_pos = self.find_next_position()
@@ -39,7 +40,7 @@ class Molecule():
             self.speed = GROUND_SPEED
     
     def animate_molecule(self):
-        self.temp, = plt.plot(*self.curr_pos, 'ro')
+        self.temp, = plt.plot(*self.curr_pos, color=self.m_color, marker='o')
         ani = FuncAnimation(self._fig, self.update_molecule, interval=10)
         plt.show()
     
@@ -51,7 +52,8 @@ class Molecule():
         self._ax.set_ylim(-1, 1)
 
     def __init__(self):
-
+        
+        self.m_color = MOLECULE_TYPES_TO_COLORS['H2O']
         self.excited = False
         self.set_state()
 

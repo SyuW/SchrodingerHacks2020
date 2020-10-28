@@ -15,9 +15,9 @@ class MolecularView():
             ax.set_xlim(-1, 1)
             ax.set_ylim(-1, 1)
             plt.axis("off")
-            m.temp, = plt.plot(*m.curr_pos, 'ro')
+            m.temp, = plt.plot(*m.curr_pos, color=m.m_color, marker='o')
         
-        ani = FuncAnimation(self.fig, self.update_all_molecules, interval=1)
+        ani = FuncAnimation(self.fig, self.update_all_molecules, interval=10)
 
         plt.show()
 
