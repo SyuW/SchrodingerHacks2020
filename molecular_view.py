@@ -43,7 +43,7 @@ class Photon(Molecule):
         self.reached_end = False
         self.reached_middle = False
         self.got_absorbed = False
-        self.reemited = False
+        self.reemitted = False
         self.speed = 0.01
         self.m_dist_tolerance = 0.01
         self.m_color = "y"
@@ -54,8 +54,14 @@ class Photon(Molecule):
             self.next_pos   = np.array([np.random.uniform(0.1, 0.9), 1.0])
         else:
             self.curr_pos = np.array(set_pos)
-            self.next_pos = np.array([np.random.uniform(0.1, 0.9), 0.0])
-            self.reemited = True
+            # Can be emitted up or down
+            if np.random.randint(2): # Flip a coin
+                # emit down
+                self.next_pos = np.array([np.random.uniform(0.1, 0.9), 0.0])
+            else:
+                self.next_pos = np.array([np.random.uniform(0.1, 0.9), 1.0])
+
+            self.reemitted = True
             # adjustment so that reemitted photon is at same speed
             self.speed = 0.02
 
@@ -122,13 +128,13 @@ class MolecularView():
             p.update_photon(frame)
 
             # incoming reflected photon
-            if p.curr_pos[1] <= 0.01 and p.reemited:
-                if p.reemited:
+            if p.curr_pos[1] <= 0.01 and p.reemitted:
+                if p.reemitted:
                     p.temp.remove()
 
             # molecule grid interaction
             elif p.curr_pos[1] >= 0.49 and p.curr_pos[1] <= 0.5:
-                if not p.reemited:
+                if not p.reemitted:
                     p.determine_absorption()
                     # absorbed
                     if p.got_absorbed:
@@ -139,8 +145,11 @@ class MolecularView():
                         # absorb anyways even if excited
                         else:
                             pass
+                    else:
+                        retained_photons += [p]
                 else:
                     retained_photons += [p]
+
             # photon reached end
             elif p.curr_pos[1] >= 0.99:
                 p.temp.remove()
@@ -148,6 +157,13 @@ class MolecularView():
             else:
                 retained_photons += [p]
         self.photons = retained_photons
+
+    def make_legend(self, axis):
+        axis.legend(["Molecules"], loc="lower right")
+
+    def create_molecule_seq(self):
+        #self.molecular_seq = np.random.choice(np.arange(1, 4))
+        pass
 
     def generate_photon(self):
         p = Photon()
@@ -174,7 +190,9 @@ class MolecularView():
         self.photon_axes = self.fig.add_subplot(111)
         self.photon_axes.set_xlim(0, 1)
         self.photon_axes.set_ylim(0, 1)
+        self.make_legend(self.photon_axes)
         plt.axis("off")
+
         self.photons = []
         self.generate_photon()
 

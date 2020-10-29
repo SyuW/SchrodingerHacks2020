@@ -1,25 +1,24 @@
 import numpy as np
-import sympy
 
 '''
 Basic model of greenhouse effect assuming Earth and atmosphere behave as ideal black bodies, single atmospheric layer, constant albedo/emissivity,
 among other things...
 See: http://www.realclimate.org/index.php/archives/2007/04/learning-from-a-simple-model/
      https://en.wikipedia.org/wiki/Idealized_greenhouse_model
+     https://en.wikipedia.org/wiki/Greenhouse_gas#Greenhouse_gases
      https://www.acs.org/content/acs/en/climatescience/atmosphericwarming/singlelayermodel.html
-
-Extensions for introducing realism/complexity:
-- feedback mechanisms for albedo and atmospheric emissivity
-- Atmospheric convection
-- Clouds; condensation of water vapour into droplets releases latent energy into atmosphere and scatter radiation
-- Multi-layer representation of atmosphere
 '''
 
 # constants
 S_c = 1366 #W * m^(-2)
 sb = 5.67 * 10 ** (-8)
 albedo = 0.3
-emv = 1 #emissivity
+emv = 0.7 #emissivity
+# From wikipedia
+greenhouse_contributions = {1: 0.58,
+                            2: 0.26,
+                            3: 0.09,
+                            4: 0.07}
 
 
 def main():

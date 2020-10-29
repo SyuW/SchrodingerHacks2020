@@ -10,7 +10,6 @@ GROUND_SPEED            = 0.10; EXCITED_SPEED            = 0.20
 MOLECULE_TYPES_TO_COLORS = {"CO2": "r",
                             "H2O": "cornflowerblue",
                             "CH4": "k",
-                            "N2O": "m",
                             "O3" : "b"}
 
 
@@ -66,7 +65,7 @@ class Molecule():
             self.speed = GROUND_SPEED
 
     def animate_molecule(self):
-        # Store the molecule's current position as a tempvalue for updating
+        # Store the molecule's current position as a temp value for updating
         self.temp, = plt.plot(*self.curr_pos, color=self.m_color, marker='o')
         ani = FuncAnimation(self._fig, self.update_molecule, interval=10)
         plt.show()
@@ -80,7 +79,7 @@ class Molecule():
 
     def __init__(self):
 
-        self.m_color = MOLECULE_TYPES_TO_COLORS['N2O']
+        self.m_color = MOLECULE_TYPES_TO_COLORS['CO2']
         self.m_dist_tolerance = 0.1
         self.excited = False
         self.set_state()
