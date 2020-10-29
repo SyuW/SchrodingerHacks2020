@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
+EXCITATION_TIME_BEFORE_EMIT = 5
+
 class Photon(Molecule):
     # self figure creation method
     def create_figure_axes(self):
@@ -16,15 +18,9 @@ class Photon(Molecule):
         self.ax.set_xlim(0, 1)
         self.ax.set_ylim(0, 1)
 
-    def determine_transmission_reflection(self):
+    def determine_absorption(self):
         # Probability of absorption dependent on emissivity of atmosphere
         self.got_absorbed = bool(np.random.binomial(n=1, p=basic_greenhouse_model.emv))
-        # absorption
-        if self.got_absorbed:
-            self.temp.remove()
-        # transmission
-        else:
-            pass
 
     # Override inherited method from Molecule class
     def find_next_position(self):
@@ -32,12 +28,6 @@ class Photon(Molecule):
 
     def update_photon(self, i):
         self.update_molecule(i)
-        if self.curr_pos[1] >= 0.49 and self.curr_pos[1] <= 0.50:
-            self.reached_middle = True
-            self.determine_transmission_reflection()
-        if self.curr_pos[1] >= 0.99:
-            self.reached_end = True
-            self.temp.remove()
 
     def animate_just_photon(self):
         self.create_figure_axes()
@@ -45,13 +35,21 @@ class Photon(Molecule):
         ani = FuncAnimation(self.fig, self.update_photon, interval=10)
         plt.show()
 
-    def __init__(self):
+    def __init__(self, set_pos=None):
         Molecule.__init__(self)
 
-        # Determine start and end points for photon's trajectory
-        self.curr_pos   = np.array([np.random.uniform(0.1, 0.9), 0.0])
-        self.next_pos   = np.array([np.random.uniform(0.1, 0.9), 1.0])
-        self.displ      = self.next_pos - self.curr_pos
+        self.reflected = False
+
+        if set_pos == None:
+            # Determine start and end points for photon's trajectory
+            self.curr_pos   = np.array([np.random.uniform(0.1, 0.9), 0.0])
+            self.next_pos   = np.array([np.random.uniform(0.1, 0.9), 1.0])
+        else:
+            self.curr_pos = np.array(set_pos)
+            self.next_pos = np.array([np.random.uniform(0.1, 0.9), 0.0])
+            self.reflected = True
+
+        self.displ = self.next_pos - self.curr_pos
 
         self.reached_end = False
         self.reached_middle = False
@@ -84,7 +82,7 @@ class MolecularView():
         ani = FuncAnimation(self.fig, self.update_all_molecules, interval=5)
         plt.show()
         # if the plot window is closed, cancel timer
-        self.t.cancel()
+        self.photon_gen_t.cancel()
 
     def produce_excitation(self, molecule):
         molecule.change_state()
@@ -106,10 +104,19 @@ class MolecularView():
         retained_photons = []
         for p in self.photons:
             p.update_photon(frame)
-            if p.got_absorbed:
-                self.excitations[self.check_region(p)] = True
-            elif p.reached_end:
-                continue
+            if p.curr_pos[1] <= 0.01 and p.reflected:
+                p.temp.remove()
+            elif p.curr_pos[1] >= 0.49 and p.curr_pos[1] <= 0.5:
+                p.determine_absorption()
+                # absorbed
+                if p.got_absorbed:
+                    p.temp.remove()
+                    self.excitations[self.check_region(p)] = True
+                # transmitted
+                else:
+                    retained_photons += [p]
+            elif p.curr_pos[1] >= 0.99:
+                p.temp.remove()
             else:
                 retained_photons += [p]
         self.photons = retained_photons
@@ -121,8 +128,8 @@ class MolecularView():
         # Poisson generation, avoid 0 values with offset of 1
         # and set next photon generation event
         self.time_before_next_photon = np.random.poisson(1) + 1
-        self.t = Timer(self.time_before_next_photon, self.generate_photon)
-        self.t.start()
+        self.photon_gen_t = Timer(self.time_before_next_photon, self.generate_photon)
+        self.photon_gen_t.start()
 
     def __init__(self, num_molecules):
         self.fig, self.axs = plt.subplots(nrows=1, ncols=num_molecules)
@@ -147,4 +154,4 @@ class MolecularView():
 
 if __name__ == "__main__":
     mview = MolecularView(num_molecules=10)
-    #p = Photon().animate_just_photon()
+    #p = Photon(set_pos=[0.4, 0.5]).animate_just_photon()
