@@ -120,27 +120,31 @@ class MolecularView():
         retained_photons = []
         for p in self.photons:
             p.update_photon(frame)
+
             # incoming reflected photon
             if p.curr_pos[1] <= 0.01 and p.reemited:
-                p.temp.remove()
+                if p.reemited:
+                    p.temp.remove()
+
             # molecule grid interaction
             elif p.curr_pos[1] >= 0.49 and p.curr_pos[1] <= 0.5:
-                p.determine_absorption()
-                # absorbed
-                if p.got_absorbed:
-                    region_hit = self.check_region(p)
-                    if not self.excitations[region_hit]:
+                if not p.reemited:
+                    p.determine_absorption()
+                    # absorbed
+                    if p.got_absorbed:
+                        region_hit = self.check_region(p)
                         p.temp.remove()
-                        self.excitations[region_hit] = True
-                    # if molecule is already excited, just transmit
-                    else:
-                        retained_photons += [p]
-                # transmitted
+                        if not self.excitations[region_hit]:
+                            self.excitations[region_hit] = True
+                        # absorb anyways even if excited
+                        else:
+                            pass
                 else:
                     retained_photons += [p]
             # photon reached end
             elif p.curr_pos[1] >= 0.99:
                 p.temp.remove()
+
             else:
                 retained_photons += [p]
         self.photons = retained_photons

@@ -51,7 +51,6 @@ class Molecule():
         else:
             self.excited = True
         self.set_state()
-        print([self.rmax, self.speed])
         # Reintialize positions so that molecule doesn't fly off
         # from speed change
         self.curr_pos = np.array([0., 0.])

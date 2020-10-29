@@ -19,7 +19,7 @@ Extensions for introducing realism/complexity:
 S_c = 1366 #W * m^(-2)
 sb = 5.67 * 10 ** (-8)
 albedo = 0.3
-emv = 0.7 #emissivity
+emv = 1 #emissivity
 
 
 def main():
