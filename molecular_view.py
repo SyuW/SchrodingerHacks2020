@@ -1,8 +1,8 @@
 from matplotlib.animation import FuncAnimation
 from random_motion import Molecule
+from threading import Timer
 import matplotlib.pyplot as plt
 import numpy as np
-import shapely.geometry as sgeom
 
 
 class Photon(Molecule):
@@ -14,26 +14,21 @@ class Photon(Molecule):
         self.ax.set_xlim(0, 1)
         self.ax.set_ylim(0, 1)
 
+    def determine_transmission_reflection(self):
+        self.reflect_off = bool(np.random.randint(2)) #flip a coin
+
     # Override inherited method from Molecule class
     def find_next_position(self):
         return self.next_pos
 
-    def select_molecule_for_excitation(self):
-        return
-
-    def address_collision(self):
-        if self.hit_molecule:
-            # Set transmission/absorption probability based on real data later
-            self.be_absorbed = bool(np.random.randint(0, 2))
-            if self.be_absorbed:
-                self.destroy = True
-            else:
-                pass
-        else:
-            self.destroy = True
-
     def update_photon(self, i):
         self.update_molecule(i)
+        if self.curr_pos[1] >= 0.49 and self.curr_pos[1] <= 0.51:
+            self.reached_middle = True
+            self.determine_transmission_reflection()
+        if self.curr_pos[1] >= 0.99:
+            self.reached_end = True
+            self.temp.remove()
 
     def animate_just_photon(self):
         self.create_figure_axes()
@@ -49,11 +44,9 @@ class Photon(Molecule):
         self.next_pos   = np.array([np.random.uniform(0.1, 0.9), 1.0])
         self.displ      = self.next_pos - self.curr_pos
 
-        # Initialize collision detection and destruction params
-        self.hit_polygon = False
-        self.hit_molecule = False
-        self.destroy = False
-
+        self.reached_end = False
+        self.reached_middle = False
+        self.reflect_off = False
         self.speed = 0.01
         self.m_dist_tolerance = 0.01
         self.m_color = "y"
@@ -72,8 +65,9 @@ class MolecularView():
             m.temp, = plt.plot(*m.curr_pos, color=m.m_color, marker='o')
         # Prepare the photon's axes
         plt.sca(self.photon_axes)
-        self.p.temp, = plt.plot(*self.p.curr_pos, color=self.p.m_color, marker='o')
-        
+        for p in self.photons:
+            p.temp, = plt.plot(*p.curr_pos, color=p.m_color, marker='o')
+
         ani = FuncAnimation(self.fig, self.update_all_molecules, interval=5)
         plt.show()
 
@@ -84,20 +78,36 @@ class MolecularView():
             plt.sca(ax)
             m = (self.ms)[i]
             m.update_molecule(i)
-        # Update photon's position
+        # Update photon's position and don't retain if reached end
         plt.sca(self.photon_axes)
-        self.p.update_photon(i)
+        retained_photons = []
+        for p in self.photons:
+            p.update_photon(i)
+            if p.reached_middle:
+                pass
+            if not p.reached_end:
+                retained_photons += [p]
+        self.photons = retained_photons
+
+    def generate_photon(self):
+        self.photons += [Photon()]
+
+        self.time_before_next_photon = np.random.poisson(1) + 1 # average of one sec between photons
+
+        return
 
     def __init__(self, num_molecules):
         self.fig, self.axs = plt.subplots(nrows=1, ncols=num_molecules)
         self.fig.patch.set_visible(False)
         self.ms = [Molecule() for _ in self.axs]
 
-        self.p = Photon()
         self.photon_axes = self.fig.add_subplot(111)
         self.photon_axes.set_xlim(0, 1)
         self.photon_axes.set_ylim(0, 1)
         plt.axis("off")
+
+        self.photons = []
+        self.generate_photon()
 
         self.render_molecules()
 
