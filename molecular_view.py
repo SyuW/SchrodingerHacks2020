@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-EXCITATION_TIME_BEFORE_EMIT = 5
+TIME_BEFORE_EMIT = 5
 
 class Photon(Molecule):
     # self figure creation method
@@ -38,7 +38,13 @@ class Photon(Molecule):
     def __init__(self, set_pos=None):
         Molecule.__init__(self)
 
+        self.reached_end = False
+        self.reached_middle = False
+        self.got_absorbed = False
         self.reemited = False
+        self.speed = 0.01
+        self.m_dist_tolerance = 0.01
+        self.m_color = "y"
 
         if set_pos == None:
             # Determine start and end points for photon's trajectory
@@ -48,15 +54,10 @@ class Photon(Molecule):
             self.curr_pos = np.array(set_pos)
             self.next_pos = np.array([np.random.uniform(0.1, 0.9), 0.0])
             self.reemited = True
+            # adjustment so that reemitted photon is at same speed
+            self.speed = 0.02
 
         self.displ = self.next_pos - self.curr_pos
-
-        self.reached_end = False
-        self.reached_middle = False
-        self.got_absorbed = False
-        self.speed = 0.01
-        self.m_dist_tolerance = 0.01
-        self.m_color = "y"
 
 
 class MolecularView():
@@ -81,15 +82,22 @@ class MolecularView():
 
         ani = FuncAnimation(self.fig, self.update_all_molecules, interval=5)
         plt.show()
-        # if the plot window is closed, cancel timer
+        # if the plot window is closed, cancel threads
         self.photon_gen_t.cancel()
+        self.emission_t.cancel()
 
     def produce_excitation(self, molecule, region_num):
         molecule.change_state()
+        self.emission_t = Timer(TIME_BEFORE_EMIT, self.emit_photon, args=[molecule, region_num])
+        self.emission_t.start()
+
+    # Emit photon and transition back to ground state
+    def emit_photon(self, molecule, region_num):
         r_photon = Photon(set_pos=[self.interval_length*(region_num+1)-0.05, 0.5])
         plt.sca(self.photon_axes)
         r_photon.temp, = plt.plot(*r_photon.curr_pos, color=r_photon.m_color, marker='o')
         self.photons += [r_photon]
+        molecule.change_state()
 
     # Updates the positions of all molecules in grid
     def update_all_molecules(self, frame):
@@ -117,10 +125,10 @@ class MolecularView():
                 # absorbed
                 if p.got_absorbed:
                     region_hit = self.check_region(p)
-                    # if molecule is already excited, just transmit
                     if not self.excitations[region_hit]:
                         p.temp.remove()
                         self.excitations[region_hit] = True
+                    # if molecule is already excited, just transmit
                     else:
                         retained_photons += [p]
                 # transmitted
@@ -144,6 +152,7 @@ class MolecularView():
         self.photon_gen_t.start()
 
     def __init__(self, num_molecules):
+
         self.fig, self.axs = plt.subplots(nrows=1, ncols=num_molecules)
         self.fig.patch.set_visible(False)
         self.ms = [Molecule() for _ in self.axs]

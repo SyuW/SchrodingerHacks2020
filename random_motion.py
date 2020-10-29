@@ -48,6 +48,7 @@ class Molecule():
     def change_state(self):
         if self.excited:
             self.excited = False
+            print('ja'); print(self.excited)
         else:
             self.excited = True
         self.set_state()
