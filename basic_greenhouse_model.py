@@ -10,7 +10,7 @@ See: http://www.realclimate.org/index.php/archives/2007/04/learning-from-a-simpl
 '''
 
 # constants
-S_c = 1366 #W * m^(-2)
+S_c = 1366 # Solar constant [W * m^(-2)]
 sb = 5.67 * 10 ** (-8)
 albedo = 0.3
 emv = 0.5 #emissivity

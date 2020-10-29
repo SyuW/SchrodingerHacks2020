@@ -1,13 +1,14 @@
+
+# Custom imports
 import basic_greenhouse_model
 from random_motion import Molecule
 
+# External libraries
 from matplotlib.animation import FuncAnimation
 from threading import Timer
 import matplotlib.pyplot as plt
 import numpy as np
 
-
-TIME_BEFORE_EMIT = 5
 
 class Photon(Molecule):
 
@@ -19,8 +20,8 @@ class Photon(Molecule):
         self.ax.set_xlim(0, 1)
         self.ax.set_ylim(0, 1)
 
+    # Probability of absorption dependent on emissivity of atmosphere
     def determine_absorption(self):
-        # Probability of absorption dependent on emissivity of atmosphere
         self.got_absorbed = bool(np.random.binomial(n=1, p=basic_greenhouse_model.emv))
 
     # Override inherited method from Molecule class
@@ -31,6 +32,7 @@ class Photon(Molecule):
     def update_photon(self, i):
         self.update_molecule(i)
 
+    # Method for just animating the photon
     def animate_just_photon(self):
         self.create_figure_axes()
         self.temp, = plt.plot(*self.curr_pos, color=self.m_color, marker='o')
@@ -95,7 +97,7 @@ class MolecularView():
 
     def produce_excitation(self, molecule, region_num):
         molecule.change_state()
-        self.emission_t = Timer(TIME_BEFORE_EMIT, self.emit_photon, args=[molecule, region_num])
+        self.emission_t = Timer(self.time_before_emission, self.emit_photon, args=[molecule, region_num])
         self.emission_t.start()
 
     # Emit photon and transition back to ground state
@@ -155,10 +157,8 @@ class MolecularView():
 
             else:
                 retained_photons += [p]
-        self.photons = retained_photons
 
-    def make_legend(self, axis):
-        axis.legend(["Molecules"], loc="lower right")
+        self.photons = retained_photons
 
     def create_molecule_seq(self):
         #self.molecular_seq = np.random.choice(np.arange(1, 4))
@@ -168,30 +168,32 @@ class MolecularView():
         p = Photon()
         p.temp, = plt.plot(*p.curr_pos, color=p.m_color, marker='o')
         self.photons += [p]
-        # Poisson generation, avoid 0 values with offset of 1
-        # and set next photon generation event
-        self.time_before_next_photon = np.random.poisson(1) + 1
+        # Poisson photon generation, avoid 0 values with offset
+        # and set timed next photon generation event
+        self.time_before_next_photon = (np.random.poisson(1))*0.5 + 0.5
         self.photon_gen_t = Timer(self.time_before_next_photon, self.generate_photon)
         self.photon_gen_t.start()
 
     def __init__(self, num_molecules):
 
+        # Set up the main figure, axes for all molecules
         self.fig, self.axs = plt.subplots(nrows=1, ncols=num_molecules)
         self.fig.patch.set_visible(False)
         self.ms = [Molecule() for _ in self.axs]
-
+        # Initialize region data for photon interactions
         self.interval_length = 1.0 / num_molecules
         self.excitations = [False for m in self.ms]
         self.molecule_region_bounds = [i*self.interval_length
                                        for i in range(len(self.ms))]
 
-        # Photon stuff
+        # Photon figure, axes, superimposed on main figure
         self.photon_axes = self.fig.add_subplot(111)
         self.photon_axes.set_xlim(0, 1)
         self.photon_axes.set_ylim(0, 1)
-        self.make_legend(self.photon_axes)
         plt.axis("off")
 
+        # Photon data
+        self.time_before_emission = 3 #seconds
         self.photons = []
         self.generate_photon()
 
