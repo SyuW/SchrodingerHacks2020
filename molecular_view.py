@@ -10,6 +10,7 @@ import numpy as np
 TIME_BEFORE_EMIT = 5
 
 class Photon(Molecule):
+
     # self figure creation method
     def create_figure_axes(self):
         self.fig = plt.figure()
@@ -23,6 +24,7 @@ class Photon(Molecule):
         self.got_absorbed = bool(np.random.binomial(n=1, p=basic_greenhouse_model.emv))
 
     # Override inherited method from Molecule class
+    # I know shadowing is bad, but this made my life much easier
     def find_next_position(self):
         return self.next_pos
 
@@ -62,7 +64,7 @@ class Photon(Molecule):
 
 class MolecularView():
 
-    # Call if photon gets absorbed
+    # Determine which molecule had the collision
     def check_region(self, photon):
         for i, bound in enumerate(self.molecule_region_bounds):
             if photon.curr_pos[0] > bound:
@@ -97,7 +99,9 @@ class MolecularView():
         plt.sca(self.photon_axes)
         r_photon.temp, = plt.plot(*r_photon.curr_pos, color=r_photon.m_color, marker='o')
         self.photons += [r_photon]
-        molecule.change_state()
+        self.ms[region_num].change_state()
+        self.excitations[region_num] = False
+        #print([region_num, molecule.rmax, molecule.speed])
 
     # Updates the positions of all molecules in grid
     def update_all_molecules(self, frame):
