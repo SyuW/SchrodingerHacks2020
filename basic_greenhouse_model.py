@@ -1,12 +1,16 @@
 import numpy as np
 
 '''
-Basic model of greenhouse effect assuming Earth and atmosphere behave as ideal black bodies, single atmospheric layer, constant albedo/emissivity,
+Basic model of greenhouse effect assuming Earth and atmosphere behave as
+ideal black bodies, single atmospheric layer, constant albedo/emissivity,
 among other things...
 See: http://www.realclimate.org/index.php/archives/2007/04/learning-from-a-simple-model/
      https://en.wikipedia.org/wiki/Idealized_greenhouse_model
      https://en.wikipedia.org/wiki/Greenhouse_gas#Greenhouse_gases
      https://www.acs.org/content/acs/en/climatescience/atmosphericwarming/singlelayermodel.html
+
+Authors: Sam Yu
+Date: October 29, 2020 
 '''
 
 # constants

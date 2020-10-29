@@ -1,3 +1,9 @@
+"""
+File for generating the greenhouse layer visualization
+
+Authors: Sam Yu, David Tsetlin
+Date: October 29, 2020
+"""
 
 # Custom imports
 import basic_greenhouse_model
@@ -97,7 +103,8 @@ class MolecularView():
 
     def produce_excitation(self, molecule, region_num):
         molecule.change_state()
-        self.emission_t = Timer(self.time_before_emission, self.emit_photon, args=[molecule, region_num])
+        self.emission_t = Timer(self.time_before_emission, self.emit_photon,
+                                args=[molecule, region_num])
         self.emission_t.start()
 
     # Emit photon and transition back to ground state

@@ -6,9 +6,14 @@ Date: October 29, 2020
 """
 
 import sys
+sys.path.append("..")
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
+
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
+import basic_greenhouse_model
+
 
 # This is the class which inherits from the application window object
 # and modifies it so that
@@ -42,6 +47,7 @@ class MainWindow(QMainWindow):
         self.resize(self.width, self.height)
 
     # This updates the UI elements to scale wtih the window size
+    # Pass box visualization through here later - Sam
     def updateUI(self):
         sunWidthScale = 0.4
         sunHeightScale = 0.35
@@ -50,7 +56,7 @@ class MainWindow(QMainWindow):
         self.sunHeight = sunHeightScale * min(self.width, self.height)
 
         self.EarthLabel.setGeometry(QRect(0, 0, self.width, self.height))
-        self.SunLabel.setGeometry(QRect(-sunWidth / 2, -sunHeight / 2 , sunWidth, sunHeight))
+        self.SunLabel.setGeometry(QRect(-self.sunWidth / 2, -self.sunHeight / 2 , self.sunWidth, self.sunHeight))
 
         self.updateSlider()
 
@@ -69,7 +75,7 @@ class MainWindow(QMainWindow):
 
     def sliderSetup(self):
         # These are values required by the wavelength slider
-        min_wavelength = 0
+        min_wavelength = 1
         max_wavelength = 100
         wavelength_step = 10
         start_wavelength = 0
@@ -173,7 +179,8 @@ class MainWindow(QMainWindow):
         y_text = y_slider
 
         # updates text associated to all the sliders
-        self.wavelengthLabel.setText("Wavelength: %d nm" % self.wavelengthValue)
+        # wavelength units changed to micrometers -Sam
+        self.wavelengthLabel.setText("Wavelength: %d \u03BCm" % self.wavelengthValue)
         self.albedoLabel.setText("Albedo: %g" % (self.albedoValue / self.albedo_scale))
         self.emissivityLabel.setText("Emissivity: %g" % (self.emissivityValue / self.albedo_scale))
 
@@ -186,6 +193,13 @@ class MainWindow(QMainWindow):
         self.emissivityLabel.move(x_text, y_text + (2 * slider_height))
 
     def setupFluxLines(self):
+        # Moved sunWidths and scales to this function because they were called
+        # before being defined -Sam
+        sunWidthScale = 0.4
+        sunHeightScale = 0.35
+        self.sunWidth = sunWidthScale * min(self.width, self.height)
+        self.sunHeight = sunHeightScale * min(self.width, self.height)
+
         lineup = QPixmap("LineUp.png")
         linedown = QPixmap("LineDown.png")
 
@@ -209,7 +223,7 @@ class MainWindow(QMainWindow):
     def updateFluxLines(self):
         opacity_effect = QGraphicsOpacityEffect()
 
-        opacity_effect.setOpacity(0)
+        opacity_effect.setOpacity(1)
 
 def reqWidthHeight(x_i, y_i, x_f, y_f):
     return (x_f - x_i), (y_f - y_i)

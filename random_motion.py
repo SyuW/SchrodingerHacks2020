@@ -1,3 +1,10 @@
+"""
+File responsible for random motion of molecule and molecular parameters
+
+Authors: Sam Yu
+Date: October 29, 2020
+"""
+
 from matplotlib.animation import FuncAnimation
 from pathlib import Path
 from threading import Timer
