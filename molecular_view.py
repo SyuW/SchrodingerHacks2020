@@ -38,7 +38,7 @@ class Photon(Molecule):
     def __init__(self, set_pos=None):
         Molecule.__init__(self)
 
-        self.reflected = False
+        self.reemited = False
 
         if set_pos == None:
             # Determine start and end points for photon's trajectory
@@ -47,7 +47,7 @@ class Photon(Molecule):
         else:
             self.curr_pos = np.array(set_pos)
             self.next_pos = np.array([np.random.uniform(0.1, 0.9), 0.0])
-            self.reflected = True
+            self.reemited = True
 
         self.displ = self.next_pos - self.curr_pos
 
@@ -84,8 +84,12 @@ class MolecularView():
         # if the plot window is closed, cancel timer
         self.photon_gen_t.cancel()
 
-    def produce_excitation(self, molecule):
+    def produce_excitation(self, molecule, region_num):
         molecule.change_state()
+        r_photon = Photon(set_pos=[self.interval_length*(region_num+1)-0.05, 0.5])
+        plt.sca(self.photon_axes)
+        r_photon.temp, = plt.plot(*r_photon.curr_pos, color=r_photon.m_color, marker='o')
+        self.photons += [r_photon]
 
     # Updates the positions of all molecules in grid
     def update_all_molecules(self, frame):
@@ -96,7 +100,7 @@ class MolecularView():
             # update state/position of grid molecule
             m = (self.ms)[i]
             if m.excited != is_excited:
-                self.produce_excitation(m)
+                self.produce_excitation(m, region_num=i)
             m.update_molecule(frame)
         # Update photon's position and don't retain if reached end
         # Alter excitation states for molecules if interaction
@@ -104,17 +108,25 @@ class MolecularView():
         retained_photons = []
         for p in self.photons:
             p.update_photon(frame)
-            if p.curr_pos[1] <= 0.01 and p.reflected:
+            # incoming reflected photon
+            if p.curr_pos[1] <= 0.01 and p.reemited:
                 p.temp.remove()
+            # molecule grid interaction
             elif p.curr_pos[1] >= 0.49 and p.curr_pos[1] <= 0.5:
                 p.determine_absorption()
                 # absorbed
                 if p.got_absorbed:
-                    p.temp.remove()
-                    self.excitations[self.check_region(p)] = True
+                    region_hit = self.check_region(p)
+                    # if molecule is already excited, just transmit
+                    if not self.excitations[region_hit]:
+                        p.temp.remove()
+                        self.excitations[region_hit] = True
+                    else:
+                        retained_photons += [p]
                 # transmitted
                 else:
                     retained_photons += [p]
+            # photon reached end
             elif p.curr_pos[1] >= 0.99:
                 p.temp.remove()
             else:
@@ -154,4 +166,4 @@ class MolecularView():
 
 if __name__ == "__main__":
     mview = MolecularView(num_molecules=10)
-    #p = Photon(set_pos=[0.4, 0.5]).animate_just_photon()
+    # = Photon(set_pos=[0.4, 0.5]).animate_just_photon()
