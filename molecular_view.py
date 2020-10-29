@@ -86,6 +86,9 @@ class MolecularView():
         # if the plot window is closed, cancel timer
         self.t.cancel()
 
+    def produce_excitation(self, molecule):
+        molecule.change_state()
+
     # Updates the positions of all molecules in grid
     def update_all_molecules(self, frame):
         # Update the grid molecule positions
@@ -94,10 +97,8 @@ class MolecularView():
             plt.sca(ax)
             # update state/position of grid molecule
             m = (self.ms)[i]
-            '''
             if m.excited != is_excited:
-                m.change_state()
-            '''
+                self.produce_excitation(m)
             m.update_molecule(frame)
         # Update photon's position and don't retain if reached end
         # Alter excitation states for molecules if interaction
@@ -106,8 +107,7 @@ class MolecularView():
         for p in self.photons:
             p.update_photon(frame)
             if p.got_absorbed:
-                m_index = self.check_region(p)
-                print(m_index)
+                self.excitations[self.check_region(p)] = True
             elif p.reached_end:
                 continue
             else:

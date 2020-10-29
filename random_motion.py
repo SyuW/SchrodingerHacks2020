@@ -6,7 +6,7 @@ import numpy as np
 
 
 GROUND_STATE_MAX_RADIUS = 0.15; EXCITED_STATE_MAX_RADIUS = 0.30
-GROUND_SPEED            = 0.10; EXCITED_SPEED            = 0.15
+GROUND_SPEED            = 0.10; EXCITED_SPEED            = 0.20
 MOLECULE_TYPES_TO_COLORS = {"CO2": "r",
                             "H2O": "cornflowerblue",
                             "CH4": "k",
@@ -46,7 +46,6 @@ class Molecule():
             self.displ = self.next_pos - self.curr_pos
 
     def change_state(self):
-        print("changed")
         if self.excited:
             self.excited = False
         else:
