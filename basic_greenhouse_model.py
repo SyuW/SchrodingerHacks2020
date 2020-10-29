@@ -13,7 +13,7 @@ See: http://www.realclimate.org/index.php/archives/2007/04/learning-from-a-simpl
 S_c = 1366 #W * m^(-2)
 sb = 5.67 * 10 ** (-8)
 albedo = 0.3
-emv = 0.7 #emissivity
+emv = 0.5 #emissivity
 # From wikipedia
 greenhouse_contributions = {1: 0.58,
                             2: 0.26,

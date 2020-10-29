@@ -79,7 +79,7 @@ class Molecule():
 
     def __init__(self):
 
-        self.m_color = MOLECULE_TYPES_TO_COLORS['CO2']
+        self.m_color = 'g'
         self.m_dist_tolerance = 0.1
         self.excited = False
         self.set_state()

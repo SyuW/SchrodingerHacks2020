@@ -54,9 +54,8 @@ class Photon(Molecule):
             self.next_pos   = np.array([np.random.uniform(0.1, 0.9), 1.0])
         else:
             self.curr_pos = np.array(set_pos)
-            # Can be emitted up or down
+            # Emitted up or down
             if np.random.randint(2): # Flip a coin
-                # emit down
                 self.next_pos = np.array([np.random.uniform(0.1, 0.9), 0.0])
             else:
                 self.next_pos = np.array([np.random.uniform(0.1, 0.9), 1.0])
