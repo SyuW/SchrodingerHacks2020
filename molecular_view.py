@@ -23,7 +23,6 @@ class Photon(Molecule):
         # transmission
         else:
             print('transmitted')
-            return
 
     # Override inherited method from Molecule class
     def find_next_position(self):
@@ -113,14 +112,15 @@ class MolecularView():
         self.fig.patch.set_visible(False)
         self.ms = [Molecule() for _ in self.axs]
 
+        # Photon stuff
         self.photon_axes = self.fig.add_subplot(111)
         self.photon_axes.set_xlim(0, 1)
         self.photon_axes.set_ylim(0, 1)
         plt.axis("off")
-
         self.photons = []
         self.generate_photon()
 
+        # Start main event loop
         self.render_molecules()
 
 if __name__ == "__main__":

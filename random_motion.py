@@ -1,5 +1,6 @@
 from matplotlib.animation import FuncAnimation
 from pathlib import Path
+from threading import Timer
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -8,6 +9,14 @@ GROUND_STATE_MAX_RADIUS = 0.15; EXCITED_STATE_MAX_RADIUS = 0.3
 GROUND_SPEED = 0.1; EXCITED_SPEED = 0.15
 MOLECULE_TYPES_TO_COLORS = {"CO2": "r", "H2O": "cornflowerblue", "CH4": "k", "N2O": "m"}
 
+
+def state_transition_test():
+    m = Molecule()
+    t = Timer(5.0, m.change_state)
+    t.start()
+    m.construct_fig_axes()
+    m.animate_molecule()
+    t.cancel()
 
 class Molecule():
 
@@ -31,9 +40,15 @@ class Molecule():
             self.next_pos = self.find_next_position()
             self.displ = self.next_pos - self.curr_pos
 
-    def photon_event(self):
-        self.excited = True
-
+    def change_state(self):
+        print("changed")
+        if self.excited:
+            self.excited = False
+        else:
+            self.excited = True
+        self.set_state()
+        # Reintialize positions so that molecule doesn't fly off
+        # from speed change
         self.curr_pos = np.array([0., 0.])
         self.next_pos = np.array([0., 0.])
         self.displ = self.curr_pos - self.next_pos
@@ -73,6 +88,4 @@ class Molecule():
 
 
 if __name__ == "__main__":
-    m = Molecule()
-    m.construct_fig_axes()
-    m.animate_molecule()
+    state_transition_test()
