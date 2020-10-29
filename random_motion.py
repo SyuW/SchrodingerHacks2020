@@ -5,9 +5,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-GROUND_STATE_MAX_RADIUS = 0.15; EXCITED_STATE_MAX_RADIUS = 0.3
-GROUND_SPEED = 0.1; EXCITED_SPEED = 0.15
-MOLECULE_TYPES_TO_COLORS = {"CO2": "r", "H2O": "cornflowerblue", "CH4": "k", "N2O": "m"}
+GROUND_STATE_MAX_RADIUS = 0.15; EXCITED_STATE_MAX_RADIUS = 0.30
+GROUND_SPEED            = 0.10; EXCITED_SPEED            = 0.15
+MOLECULE_TYPES_TO_COLORS = {"CO2": "r",
+                            "H2O": "cornflowerblue",
+                            "CH4": "k",
+                            "N2O": "m",
+                            "O3" : "b"}
 
 
 def state_transition_test():
@@ -17,6 +21,7 @@ def state_transition_test():
     m.construct_fig_axes()
     m.animate_molecule()
     t.cancel()
+
 
 class Molecule():
 
@@ -78,7 +83,7 @@ class Molecule():
 
         self.m_color = MOLECULE_TYPES_TO_COLORS['N2O']
         self.m_dist_tolerance = 0.1
-        self.excited = False
+        self.excited = True
         self.set_state()
 
         # Initialize position variables to origin

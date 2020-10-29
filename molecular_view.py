@@ -1,5 +1,7 @@
-from matplotlib.animation import FuncAnimation
+import basic_greenhouse_model
 from random_motion import Molecule
+
+from matplotlib.animation import FuncAnimation
 from threading import Timer
 import matplotlib.pyplot as plt
 import numpy as np
@@ -15,7 +17,8 @@ class Photon(Molecule):
         self.ax.set_ylim(0, 1)
 
     def determine_transmission_reflection(self):
-        self.got_absorbed = bool(np.random.randint(2)) #flip a coin
+        # Probability of absorption dependent on emissivity of atmosphere
+        self.got_absorbed = bool(np.random.binomial(n=1, p=basic_greenhouse_model.emv))
         # absorption
         if self.got_absorbed:
             print('absorbed')
@@ -77,17 +80,24 @@ class MolecularView():
         self.t.cancel()
 
     # Updates the positions of all molecules in grid
-    def update_all_molecules(self, i):
+    def update_all_molecules(self, frame):
         # Update the grid molecule positions
         for i, ax in enumerate(self.axs):
+            is_excited = self.excitations[i]
             plt.sca(ax)
+            # update state/position of grid molecule
             m = (self.ms)[i]
-            m.update_molecule(i)
+            '''
+            if m.excited != is_excited:
+                m.change_state()
+            '''
+            m.update_molecule(frame)
         # Update photon's position and don't retain if reached end
+        # Alter excitation states for molecules if interaction
         plt.sca(self.photon_axes)
         retained_photons = []
         for p in self.photons:
-            p.update_photon(i)
+            p.update_photon(frame)
             if p.got_absorbed:
                 continue
             elif p.reached_end:
@@ -111,6 +121,7 @@ class MolecularView():
         self.fig, self.axs = plt.subplots(nrows=1, ncols=num_molecules)
         self.fig.patch.set_visible(False)
         self.ms = [Molecule() for _ in self.axs]
+        self.excitations = [False for m in self.ms]
 
         # Photon stuff
         self.photon_axes = self.fig.add_subplot(111)

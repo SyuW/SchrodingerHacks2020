@@ -2,7 +2,7 @@ import numpy as np
 import sympy
 
 '''
-Basic model of greenhouse effect assuming Earth and atmosphere behave as ideal black bodies, single atmospheric layer, constant albedo/emissivity, 
+Basic model of greenhouse effect assuming Earth and atmosphere behave as ideal black bodies, single atmospheric layer, constant albedo/emissivity,
 among other things...
 See: http://www.realclimate.org/index.php/archives/2007/04/learning-from-a-simple-model/
      https://en.wikipedia.org/wiki/Idealized_greenhouse_model
@@ -19,7 +19,7 @@ Extensions for introducing realism/complexity:
 S_c = 1366 #W * m^(-2)
 sb = 5.67 * 10 ** (-8)
 albedo = 0.3
-emv = 1 #emissivity
+emv = 0.7 #emissivity
 
 
 def main():
@@ -37,9 +37,9 @@ def main():
     greenhouse_flux = emv * sb * T_a ** 4
     planetary_flux = (1 - emv)*sb*T_s**4 + emv*sb*T_a**4
 
-    # Percentages should be roughly 100, 115, 45, 70 as per the wikipedia article for emv = 
+    # Percentages should be roughly 100, 115, 45, 70 as per the wikipedia article for emv =
     print(np.array([solar_flux, surface_flux, greenhouse_flux, planetary_flux]) * (100 / solar_flux))
-    
+
     return T_s
 
 
