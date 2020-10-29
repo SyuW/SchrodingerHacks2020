@@ -6,7 +6,7 @@ import numpy as np
 
 
 class Photon(Molecule):
-
+    # self figure creation method
     def create_figure_axes(self):
         self.fig = plt.figure()
         self.ax = self.fig.add_subplot(111)
@@ -15,7 +15,15 @@ class Photon(Molecule):
         self.ax.set_ylim(0, 1)
 
     def determine_transmission_reflection(self):
-        self.reflect_off = bool(np.random.randint(2)) #flip a coin
+        self.got_absorbed = bool(np.random.randint(2)) #flip a coin
+        # absorption
+        if self.got_absorbed:
+            print('absorbed')
+            self.temp.remove()
+        # transmission
+        else:
+            print('transmitted')
+            return
 
     # Override inherited method from Molecule class
     def find_next_position(self):
@@ -23,7 +31,7 @@ class Photon(Molecule):
 
     def update_photon(self, i):
         self.update_molecule(i)
-        if self.curr_pos[1] >= 0.49 and self.curr_pos[1] <= 0.51:
+        if self.curr_pos[1] >= 0.49 and self.curr_pos[1] <= 0.50:
             self.reached_middle = True
             self.determine_transmission_reflection()
         if self.curr_pos[1] >= 0.99:
@@ -46,7 +54,7 @@ class Photon(Molecule):
 
         self.reached_end = False
         self.reached_middle = False
-        self.reflect_off = False
+        self.got_absorbed = False
         self.speed = 0.01
         self.m_dist_tolerance = 0.01
         self.m_color = "y"
@@ -81,9 +89,11 @@ class MolecularView():
         retained_photons = []
         for p in self.photons:
             p.update_photon(i)
-            if p.reached_middle:
-                pass
-            if not p.reached_end:
+            if p.got_absorbed:
+                continue
+            elif p.reached_end:
+                continue
+            else:
                 retained_photons += [p]
         self.photons = retained_photons
 

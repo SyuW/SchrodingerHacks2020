@@ -47,6 +47,7 @@ class Molecule():
             self.speed = GROUND_SPEED
 
     def animate_molecule(self):
+        # Store the molecule's current position as a tempvalue for updating
         self.temp, = plt.plot(*self.curr_pos, color=self.m_color, marker='o')
         ani = FuncAnimation(self._fig, self.update_molecule, interval=10)
         plt.show()
