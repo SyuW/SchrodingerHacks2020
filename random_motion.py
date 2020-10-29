@@ -83,7 +83,7 @@ class Molecule():
 
         self.m_color = MOLECULE_TYPES_TO_COLORS['N2O']
         self.m_dist_tolerance = 0.1
-        self.excited = True
+        self.excited = False
         self.set_state()
 
         # Initialize position variables to origin

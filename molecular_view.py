@@ -21,11 +21,10 @@ class Photon(Molecule):
         self.got_absorbed = bool(np.random.binomial(n=1, p=basic_greenhouse_model.emv))
         # absorption
         if self.got_absorbed:
-            print('absorbed')
             self.temp.remove()
         # transmission
         else:
-            print('transmitted')
+            pass
 
     # Override inherited method from Molecule class
     def find_next_position(self):
@@ -64,6 +63,14 @@ class Photon(Molecule):
 
 class MolecularView():
 
+    # Call if photon gets absorbed
+    def check_region(self, photon):
+        for i, bound in enumerate(self.molecule_region_bounds):
+            if photon.curr_pos[0] > bound:
+                continue
+            else:
+                return i-1
+
     def render_molecules(self):
         # Prepare all molecules' axes
         for i, ax in enumerate(self.axs):
@@ -99,7 +106,8 @@ class MolecularView():
         for p in self.photons:
             p.update_photon(frame)
             if p.got_absorbed:
-                continue
+                m_index = self.check_region(p)
+                print(m_index)
             elif p.reached_end:
                 continue
             else:
@@ -110,7 +118,6 @@ class MolecularView():
         p = Photon()
         p.temp, = plt.plot(*p.curr_pos, color=p.m_color, marker='o')
         self.photons += [p]
-
         # Poisson generation, avoid 0 values with offset of 1
         # and set next photon generation event
         self.time_before_next_photon = np.random.poisson(1) + 1
@@ -121,7 +128,11 @@ class MolecularView():
         self.fig, self.axs = plt.subplots(nrows=1, ncols=num_molecules)
         self.fig.patch.set_visible(False)
         self.ms = [Molecule() for _ in self.axs]
+
+        self.interval_length = 1.0 / num_molecules
         self.excitations = [False for m in self.ms]
+        self.molecule_region_bounds = [i*self.interval_length
+                                       for i in range(len(self.ms))]
 
         # Photon stuff
         self.photon_axes = self.fig.add_subplot(111)
