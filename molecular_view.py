@@ -63,13 +63,11 @@ class MolecularView():
             ax.set_ylim(-1, 1)
             plt.axis("off")
             m.temp, = plt.plot(*m.curr_pos, color=m.m_color, marker='o')
-        # Prepare the photon's axes
-        plt.sca(self.photon_axes)
-        for p in self.photons:
-            p.temp, = plt.plot(*p.curr_pos, color=p.m_color, marker='o')
 
         ani = FuncAnimation(self.fig, self.update_all_molecules, interval=5)
         plt.show()
+        # if the plot window is closed, cancel timer
+        self.t.cancel()
 
     # Updates the positions of all molecules in grid
     def update_all_molecules(self, i):
@@ -90,11 +88,15 @@ class MolecularView():
         self.photons = retained_photons
 
     def generate_photon(self):
-        self.photons += [Photon()]
+        p = Photon()
+        p.temp, = plt.plot(*p.curr_pos, color=p.m_color, marker='o')
+        self.photons += [p]
 
-        self.time_before_next_photon = np.random.poisson(1) + 1 # average of one sec between photons
-
-        return
+        # Poisson generation, avoid 0 values with offset of 1
+        # and set next photon generation event
+        self.time_before_next_photon = np.random.poisson(1) + 1
+        self.t = Timer(self.time_before_next_photon, self.generate_photon)
+        self.t.start()
 
     def __init__(self, num_molecules):
         self.fig, self.axs = plt.subplots(nrows=1, ncols=num_molecules)
