@@ -92,11 +92,11 @@ class MainWindow(QMainWindow):
         # These are the values required by the albedo and emissivity sliders
         albedo_step = 0.05
         self.albedo_scale = 100
-        start_albedo = 0.3
+        start_albedo = 0.3 * self.albedo_scale
 
         emissivity_step = 0.05
         self.emissivity_scale = 100
-        start_emissivity = 0.5
+        start_emissivity = 0.5 * self.emissivity_scale
 
         # sets up all the sliders in the scene
         self.albedoSlider = QSlider(self)
@@ -108,11 +108,11 @@ class MainWindow(QMainWindow):
 
 
         self.emissivitySlider = QSlider(self)
-        self.emissivitySlider.setMinimum(0)
+        self.emissivitySlider.setMinimum(10)
         self.emissivitySlider.setMaximum(100)
         self.emissivitySlider.setSingleStep(emissivity_step * self.emissivity_scale)
         self.emissivitySlider.setOrientation(Qt.Horizontal)
-        self.emissivitySlider.setSliderPosition(start_albedo)
+        self.emissivitySlider.setSliderPosition(start_emissivity)
 
 
         # sets up all text for the slider in the scene
@@ -195,8 +195,8 @@ class MainWindow(QMainWindow):
         opacity_albedo.setOpacity(self.albedoValue / (4 * self.albedo_scale))
         opacity_albedo_left.setOpacity(1 - (self.albedoValue / (4 * self.albedo_scale)))
         opacity_emissivity.setOpacity(1)
-        opacity_emissivity_trans.setOpacity(1)
-        opacity_emissivity_refl.setOpacity(1)
+        opacity_emissivity_trans.setOpacity((self.emissivityValue / self.emissivity_scale))
+        opacity_emissivity_refl.setOpacity(1 - (self.emissivityValue / self.emissivity_scale))
 
         self.incidentSunFlux.setGraphicsEffect(opacity_full)
         self.incidentSunFlux.setGeometry((self.sunWidth / 4), (self.sunHeight / 4),
