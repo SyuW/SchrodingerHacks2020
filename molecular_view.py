@@ -41,7 +41,8 @@ class Photon(Molecule):
     # Method for just animating the photon
     def animate_just_photon(self):
         self.create_figure_axes()
-        self.temp, = plt.plot(*self.curr_pos, color=self.m_color, marker='o')
+        self.temp, = plt.plot(*self.curr_pos, color=self.m_color, marker='o',
+                               markersize=self.size)
         ani = FuncAnimation(self.fig, self.update_photon, interval=10)
         plt.show()
 
@@ -54,7 +55,8 @@ class Photon(Molecule):
         self.reemitted = False
         self.speed = 0.01
         self.m_dist_tolerance = 0.01
-        self.m_color = "y"
+        self.m_color = "gold"
+        self.size = 5
 
         if set_pos == None:
             # Determine start and end points for photon's trajectory
@@ -93,8 +95,10 @@ class MolecularView():
             ax.set_xlim(-1, 1)
             ax.set_ylim(-1, 1)
             plt.axis("off")
-            m.temp, = plt.plot(*m.curr_pos, color=m.m_color, marker='o')
+            m.temp, = plt.plot(*m.curr_pos, color=m.m_color, marker='o',
+                                markersize=m.size)
 
+    def start_animation_loop(self):
         ani = FuncAnimation(self.fig, self.update_all_molecules, interval=5)
         plt.show()
         # if the plot window is closed, cancel threads
@@ -181,11 +185,14 @@ class MolecularView():
         self.photon_gen_t = Timer(self.time_before_next_photon, self.generate_photon)
         self.photon_gen_t.start()
 
-    def __init__(self, num_molecules):
-
+    def __init__(self, num_molecules=10):
+        # Remove the toolbar from window
+        plt.rcParams['toolbar'] = 'None'
+        plt.rcParams['figure.facecolor'] = 'lightcyan'
         # Set up the main figure, axes for all molecules
         self.fig, self.axs = plt.subplots(nrows=1, ncols=num_molecules)
-        self.fig.patch.set_visible(False)
+        #self.fig.patch.set_visible(False)
+        self.fig.canvas.set_window_title("Molecular View")
         self.ms = [Molecule() for _ in self.axs]
         # Initialize region data for photon interactions
         self.interval_length = 1.0 / num_molecules
@@ -197,6 +204,7 @@ class MolecularView():
         self.photon_axes = self.fig.add_subplot(111)
         self.photon_axes.set_xlim(0, 1)
         self.photon_axes.set_ylim(0, 1)
+        self.photon_axes.set_facecolor("lightcyan")
         plt.axis("off")
 
         # Photon data
@@ -204,9 +212,9 @@ class MolecularView():
         self.photons = []
         self.generate_photon()
 
-        # Start main event loop
         self.render_molecules()
 
 if __name__ == "__main__":
     mview = MolecularView(num_molecules=10)
-    # = Photon(set_pos=[0.4, 0.5]).animate_just_photon()
+    mview.start_animation_loop()
+    # p = Photon(set_pos=[0.4, 0.5]).animate_just_photon()

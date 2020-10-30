@@ -11,8 +11,10 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+
 import basic_greenhouse_model
+from molecular_view import MolecularView
 
 
 # This is the class which inherits from the application window object
@@ -225,6 +227,30 @@ class MainWindow(QMainWindow):
 
         opacity_effect.setOpacity(1)
 
+'''
+class PlotWindow(QDialog):
+    def update_view(self):
+        self.mview.update_all_molecules(self.frame_no)
+        self.canvas.draw()
+        self.frame_no = self.frame_no + 1
+
+    def __init__(self, parent=None):
+        super(PlotWindow, self).__init__(parent)
+
+        self.mview = MolecularView(num_molecules=10)
+        self.figure = self.mview.fig
+        self.canvas = FigureCanvas(self.figure)
+        layout = QVBoxLayout()
+        layout.addWidget(self.canvas)
+        self.setLayout(layout)
+
+        self.timer = QTimer()
+        self.timer.setInterval(5)
+        self.timer.timeout.connect(self.update_view)
+        self.frame_no = 1
+        self.timer.start()
+'''
+
 def reqWidthHeight(x_i, y_i, x_f, y_f):
     return (x_f - x_i), (y_f - y_i)
 
@@ -237,4 +263,8 @@ def main():
 
 # initializes the main() function at program initialization
 if __name__ == '__main__':
-    main()
+    #main()
+    app = QApplication(sys.argv)
+    p = PlotWindow()
+    p.show()
+    sys.exit(app.exec_())

@@ -37,7 +37,8 @@ class Molecule():
         if dist > self.m_dist_tolerance:
             self.temp.remove()
             self.curr_pos += self.displ * self.speed
-            self.temp, = plt.plot(*self.curr_pos, color=self.m_color, marker='o')
+            self.temp, = plt.plot(*self.curr_pos, color=self.m_color, marker='o',
+                                  markersize=self.size)
 
         # If reached next position, set new position and determine displacement
         else:
@@ -74,7 +75,8 @@ class Molecule():
         self._ax.set_xlim(-1, 1)
         self._ax.set_ylim(-1, 1)
         # Store the molecule's current position as a temp value for updating
-        self.temp, = plt.plot(*self.curr_pos, color=self.m_color, marker='o')
+        self.temp, = plt.plot(*self.curr_pos, color=self.m_color, marker='o',
+                               markersize=self.size)
         ani = FuncAnimation(self._fig, self.update_molecule, interval=10)
         plt.show()
 
@@ -83,6 +85,7 @@ class Molecule():
         self.m_color = 'g'
         self.m_dist_tolerance = 0.1
         self.excited = False
+        self.size = 16
 
         self.set_state()
 
