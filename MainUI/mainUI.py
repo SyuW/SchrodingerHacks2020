@@ -1,7 +1,7 @@
 """
 This is the main UI file for Team 17B's Schrodinger's Hack Project 2020.
 
-Author: Kondapuram Aditya Seshadri, Saral Shah
+Author: Kondapuram Aditya Seshadri, Saral Shah, Sam Yu
 Date: October 29, 2020
 """
 
@@ -58,22 +58,6 @@ class MainWindow(QMainWindow):
         self.updateEarthView()
         self.updateFluxLines()
 
-    def updateEarthView(self):
-        sunWidthScale = 0.4
-        sunHeightScale = 0.35
-        self.sunWidth = sunWidthScale * min(self.width, self.height)
-        self.sunHeight = sunHeightScale * min(self.width, self.height)
-
-        self.EarthLabel.setGeometry(QRect(0, 0, self.width, self.height))
-        self.SunLabel.setGeometry(QRect(-self.sunWidth / 2, -self.sunHeight / 2,
-                                        self.sunWidth, self.sunHeight))
-
-        self.EarthTempLabel.setGeometry(self.width / 2 - 145, 0.9 * self.height, 200, 45)
-        self.AtmosTempLabel.setGeometry(self.width / 2 - 135, 0.45 * self.height, 200, 45)
-
-        self.EarthTempLabel.setText("Surface Temp: %g\u2103" % round(self.T_s - 273.15, 1))
-        self.AtmosTempLabel.setText(f"Air Temp: %g\u2103" % round(self.T_a - 273.15, 1))
-
     # returns the length and width of the current window size
     def getScreenSize(self):
         return self.centralWidget().frameSize().width(), self.centralWidget().frameSize().height()
@@ -91,6 +75,34 @@ class MainWindow(QMainWindow):
         self.SunLabel = QLabel(self)
         self.SunLabel.setPixmap(QPixmap("SunDrawn.png"))
         self.SunLabel.setScaledContents(True)
+
+    def setupFluxLines(self):
+        lineup = QPixmap("LineUp.png")
+        linedown = QPixmap("LineDown.png")
+
+        self.incidentSunFlux = QLabel(self)
+        self.incidentSunFlux.setPixmap(linedown)
+        self.incidentSunFlux.setScaledContents(True)
+
+        self.reflectedSunFlux = QLabel(self)
+        self.reflectedSunFlux.setPixmap(lineup)
+        self.reflectedSunFlux.setScaledContents(True)
+
+        self.transmittedSunFlux = QLabel(self)
+        self.transmittedSunFlux.setPixmap(linedown)
+        self.transmittedSunFlux.setScaledContents(True)
+
+        self.surfaceEmittedFlux = QLabel(self)
+        self.surfaceEmittedFlux.setPixmap(lineup)
+        self.surfaceEmittedFlux.setScaledContents(True)
+
+        self.transmittedSurfaceFlux = QLabel(self)
+        self.transmittedSurfaceFlux.setPixmap(lineup)
+        self.transmittedSurfaceFlux.setScaledContents(True)
+
+        self.reflectedSurfaceFlux = QLabel(self)
+        self.reflectedSurfaceFlux.setPixmap(linedown)
+        self.reflectedSurfaceFlux.setScaledContents(True)
 
     def sliderSetup(self):
         # These are the values required by the albedo and emissivity sliders
@@ -159,33 +171,21 @@ class MainWindow(QMainWindow):
         self.emissivityLabel.setGeometry(QRect(x_text, y_text + slider_height,
                                            text_width, text_height))
 
-    def setupFluxLines(self):
-        lineup = QPixmap("LineUp.png")
-        linedown = QPixmap("LineDown.png")
+    def updateEarthView(self):
+        sunWidthScale = 0.4
+        sunHeightScale = 0.35
+        self.sunWidth = sunWidthScale * min(self.width, self.height)
+        self.sunHeight = sunHeightScale * min(self.width, self.height)
 
-        self.incidentSunFlux = QLabel(self)
-        self.incidentSunFlux.setPixmap(linedown)
-        self.incidentSunFlux.setScaledContents(True)
+        self.EarthLabel.setGeometry(QRect(0, 0, self.width, self.height))
+        self.SunLabel.setGeometry(QRect(-self.sunWidth / 2, -self.sunHeight / 2,
+                                        self.sunWidth, self.sunHeight))
 
-        self.reflectedSunFlux = QLabel(self)
-        self.reflectedSunFlux.setPixmap(lineup)
-        self.reflectedSunFlux.setScaledContents(True)
+        self.EarthTempLabel.setGeometry(self.width / 2 - 100, 0.71 * self.height, 200, 45)
+        self.AtmosTempLabel.setGeometry(self.width / 2 - 90, 0.45 * self.height, 200, 45)
 
-        self.transmittedSunFlux = QLabel(self)
-        self.transmittedSunFlux.setPixmap(linedown)
-        self.transmittedSunFlux.setScaledContents(True)
-
-        self.surfaceEmittedFlux = QLabel(self)
-        self.surfaceEmittedFlux.setPixmap(lineup)
-        self.surfaceEmittedFlux.setScaledContents(True)
-
-        self.transmittedSurfaceFlux = QLabel(self)
-        self.transmittedSurfaceFlux.setPixmap(lineup)
-        self.transmittedSurfaceFlux.setScaledContents(True)
-
-        self.reflectedSurfaceFlux = QLabel(self)
-        self.reflectedSurfaceFlux.setPixmap(linedown)
-        self.reflectedSurfaceFlux.setScaledContents(True)
+        self.EarthTempLabel.setText("Surface Temp: %g\u2103" % round(self.T_s - 273.15, 1))
+        self.AtmosTempLabel.setText(f"Air Temp: %g\u2103" % round(self.T_a - 273.15, 1))
 
     def updateFluxLines(self):
         opacity_full = QGraphicsOpacityEffect()
@@ -198,7 +198,7 @@ class MainWindow(QMainWindow):
         opacity_full.setOpacity(1)
         opacity_albedo.setOpacity(self.albedoValue / self.albedo_scale)
         opacity_albedo_left.setOpacity((1 - (self.albedoValue / self.albedo_scale)))
-        opacity_emissivity.setOpacity(self.surface_perc)
+        opacity_emissivity.setOpacity(1)
         opacity_emissivity_refl.setOpacity(self.green_perc)
         opacity_emissivity_trans.setOpacity(self.planet_perc)
 
