@@ -10,6 +10,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import basic_greenhouse_model as gmodel
+from molecular_view import MolecularView
 
 # This is the class which inherits from the application window object
 # and modifies it so that
@@ -50,8 +51,8 @@ class MainWindow(QMainWindow):
         self.width, self.height = self.getScreenSize()
         self.albedoValue = self.albedoSlider.value()
         self.emissivityValue = self.emissivitySlider.value()
-        self.T_s, self.T_a, self.green_perc, self.planet_perc = gmodel.run((self.albedoValue / self.albedo_scale),
-                                                                          (self.emissivityValue / self.emissivity_scale))
+        self.T_s, self.T_a, self.green_perc, self.planet_perc, self.surface_perc = gmodel.run((self.albedoValue / self.albedo_scale),
+                                                                                   (self.emissivityValue / self.emissivity_scale))
 
         self.updateSlider()
         self.updateEarthView()
@@ -70,8 +71,8 @@ class MainWindow(QMainWindow):
         self.EarthTempLabel.setGeometry(self.width / 2 - 145, 0.9 * self.height, 200, 45)
         self.AtmosTempLabel.setGeometry(self.width / 2 - 135, 0.45 * self.height, 200, 45)
 
-        self.EarthTempLabel.setText("Surface Temperature: %g\u2103" % round(self.T_s - 273.15, 1))
-        self.AtmosTempLabel.setText(f"Air Temperature: %g\u2103" % round(self.T_a - 273.15, 1))
+        self.EarthTempLabel.setText("Surface Temp: %g\u2103" % round(self.T_s - 273.15, 1))
+        self.AtmosTempLabel.setText(f"Air Temp: %g\u2103" % round(self.T_a - 273.15, 1))
 
     # returns the length and width of the current window size
     def getScreenSize(self):
@@ -197,7 +198,7 @@ class MainWindow(QMainWindow):
         opacity_full.setOpacity(1)
         opacity_albedo.setOpacity(self.albedoValue / self.albedo_scale)
         opacity_albedo_left.setOpacity((1 - (self.albedoValue / self.albedo_scale)))
-        opacity_emissivity.setOpacity(1)
+        opacity_emissivity.setOpacity(self.surface_perc)
         opacity_emissivity_refl.setOpacity(self.green_perc)
         opacity_emissivity_trans.setOpacity(self.planet_perc)
 
@@ -228,6 +229,11 @@ class MainWindow(QMainWindow):
         self.reflectedSurfaceFlux.setGeometry((self.sunWidth / 4) + (self.width * 0.68),
                                                 (self.sunHeight / 4) + (self.height * 0.25),
                                                 self.width * 0.18, self.height * 0.3)
+
+    # Method for running molecular visualization; spawn another thread
+    def create_molecular_view(self):
+        mview = MolecularView()
+        mview.start_animation_loop()
 
 # main() runs at program initialization, sets up the application window objects handle
 # executes them
