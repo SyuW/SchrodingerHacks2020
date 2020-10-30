@@ -10,6 +10,8 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
+from threading import Thread
+
 # This is the class which inherits from the application window object
 # and modifies it so that
 class MainWindow(QMainWindow):
@@ -37,6 +39,7 @@ class MainWindow(QMainWindow):
 
         self.EarthViewSetup()
         self.setupFluxLines()
+        self.buttonSetup()
         self.sliderSetup()
 
         self.resize(self.width, self.height)
@@ -94,7 +97,6 @@ class MainWindow(QMainWindow):
         self.albedoSlider.setOrientation(Qt.Horizontal)
         self.albedoSlider.setSliderPosition(start_albedo)
 
-
         self.emissivitySlider = QSlider(self)
         self.emissivitySlider.setMinimum(0)
         self.emissivitySlider.setMaximum(100)
@@ -102,11 +104,17 @@ class MainWindow(QMainWindow):
         self.emissivitySlider.setOrientation(Qt.Horizontal)
         self.emissivitySlider.setSliderPosition(start_albedo)
 
-
         # sets up all text for the slider in the scene
         self.albedoLabel = QLabel(self)
         self.emissivityLabel = QLabel(self)
 
+    def buttonSetup(self):
+        self.visu_button = QPushButton("money", self)
+        self.visu_button.setGeometry(1380, 340, 50, 30)
+        self.visu_button.clicked.connect(self.runVisualization)
+
+    def runVisualization(self):
+        print("lol")
 
     def updateSlider(self):
         # updates the values of the sliders as stored in memory
@@ -175,8 +183,9 @@ class MainWindow(QMainWindow):
         self.reflectedSurfaceFlux.setPixmap(linedown)
         self.reflectedSurfaceFlux.setScaledContents(True)
 
+
     def updateFluxLines(self):
-        
+
 
         self.incidentSunFlux.setGeometry((self.sunWidth / 4), (self.sunHeight / 4),
                                          self.width * 0.14, self.height * 0.25)
