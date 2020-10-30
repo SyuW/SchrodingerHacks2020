@@ -10,7 +10,7 @@ See: http://www.realclimate.org/index.php/archives/2007/04/learning-from-a-simpl
      https://www.acs.org/content/acs/en/climatescience/atmosphericwarming/singlelayermodel.html
 
 Authors: Sam Yu
-Date: October 29, 2020 
+Date: October 29, 2020
 '''
 
 # constants
@@ -40,8 +40,8 @@ def run(albedo, emv):
     greenhouse_flux = emv * sb * T_a ** 4
     planetary_flux = (1 - emv)*sb*T_s**4 + emv*sb*T_a**4
 
-    perc_green = solar_flux / greenhouse_flux
-    perc_planet = solar_flux / planetary_flux
+    perc_green = greenhouse_flux / surface_flux
+    perc_planet = planetary_flux / surface_flux
 
     # Percentages should be roughly 100, 115, 45, 70 as per the wikipedia article for emv =
     # print(np.array([solar_flux, surface_flux, greenhouse_flux, planetary_flux]) * (100 / solar_flux))
