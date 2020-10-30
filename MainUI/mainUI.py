@@ -39,6 +39,9 @@ class MainWindow(QMainWindow):
         self.setupFluxLines()
         self.sliderSetup()
 
+        self.EarthTempLabel = QLabel(self)
+        self.AtmosTempLabel = QLabel(self)
+
         self.setWindowTitle("Interactive Climate Model")
         self.resize(self.width, self.height)
 
@@ -67,11 +70,11 @@ class MainWindow(QMainWindow):
         self.SunLabel.setGeometry(QRect(-self.sunWidth / 2, -self.sunHeight / 2,
                                         self.sunWidth, self.sunHeight))
 
-        self.EarthTempLabel.setGeometry(self.width / 2 - 100, 0.9 * self.height, 200, 25)
-        self.AtmosTempLabel.setGeometry(self.width / 2 - 100, 0.5 * self.height, 200, 25)
+        self.EarthTempLabel.setGeometry(self.width / 2 - 145, 0.9 * self.height, 200, 45)
+        self.AtmosTempLabel.setGeometry(self.width / 2 - 135, 0.45 * self.height, 200, 45)
 
-        self.EarthTempLabel.setText(f"Surface Temperature: {self.T_s}")
-        self.AtmosTempLabel.setText(f"Atmosphere Temperature: {self.T_a}")
+        self.EarthTempLabel.setText("Surface Temperature: %g\u2103" % round(self.T_s - 273.15, 1))
+        self.AtmosTempLabel.setText(f"Air Temperature: %g\u2103" % round(self.T_a - 273.15, 1))
 
     # returns the length and width of the current window size
     def getScreenSize(self):
@@ -90,9 +93,6 @@ class MainWindow(QMainWindow):
         self.SunLabel = QLabel(self)
         self.SunLabel.setPixmap(QPixmap("SunDrawn.png"))
         self.SunLabel.setScaledContents(True)
-
-        self.EarthTempLabel = QLabel(self)
-        self.AtmosTempLabel = QLabel(self)
 
     def sliderSetup(self):
         # These are the values required by the albedo and emissivity sliders
@@ -201,8 +201,6 @@ class MainWindow(QMainWindow):
         opacity_albedo.setOpacity(self.albedoValue / self.albedo_scale)
         opacity_albedo_left.setOpacity((1 - (self.albedoValue / self.albedo_scale)))
         opacity_emissivity.setOpacity(1)
-        print(f"Reflected: {self.green_perc}")
-        print(f"Transmitted: {self.planet_perc}")
         opacity_emissivity_refl.setOpacity(self.green_perc)
         opacity_emissivity_trans.setOpacity(self.planet_perc)
 
