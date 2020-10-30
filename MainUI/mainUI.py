@@ -27,6 +27,8 @@ class MainWindow(QMainWindow):
         self.setupUI()
         self.show()
 
+        self.displayButton.clicked.connect(self.create_molecular_view)
+
         # This timer runs updateUI() every 10 milliseconds
         self.timer = QTimer()
         self.timer.setInterval(10)
@@ -75,6 +77,8 @@ class MainWindow(QMainWindow):
         self.SunLabel = QLabel(self)
         self.SunLabel.setPixmap(QPixmap("SunDrawn.png"))
         self.SunLabel.setScaledContents(True)
+
+        self.displayButton = QPushButton('Open Atomic View', self)
 
     def setupFluxLines(self):
         lineup = QPixmap("LineUp.png")
@@ -135,7 +139,6 @@ class MainWindow(QMainWindow):
         self.albedoLabel = QLabel(self)
         self.emissivityLabel = QLabel(self)
 
-
     def updateSlider(self):
         # general constants used by all sliders
         slider_width = 200
@@ -187,6 +190,10 @@ class MainWindow(QMainWindow):
         self.EarthTempLabel.setText("Surface Temp: %g\u2103" % round(self.T_s - 273.15, 1))
         self.AtmosTempLabel.setText(f"Air Temp: %g\u2103" % round(self.T_a - 273.15, 1))
 
+        self.displayButton.setGeometry(QRect(0.6 * self.width, 0.32 * self.height,
+                                             0.2 * self.height, 0.05 * self.height))
+
+
     def updateFluxLines(self):
         opacity_full = QGraphicsOpacityEffect()
         opacity_albedo = QGraphicsOpacityEffect()
@@ -198,7 +205,7 @@ class MainWindow(QMainWindow):
         opacity_full.setOpacity(1)
         opacity_albedo.setOpacity(self.albedoValue / self.albedo_scale)
         opacity_albedo_left.setOpacity((1 - (self.albedoValue / self.albedo_scale)))
-        opacity_emissivity.setOpacity(1)
+        opacity_emissivity.setOpacity(self.surface_perc)
         opacity_emissivity_refl.setOpacity(self.green_perc)
         opacity_emissivity_trans.setOpacity(self.planet_perc)
 
@@ -234,6 +241,7 @@ class MainWindow(QMainWindow):
     def create_molecular_view(self):
         mview = MolecularView()
         mview.start_animation_loop()
+
 
 # main() runs at program initialization, sets up the application window objects handle
 # executes them
