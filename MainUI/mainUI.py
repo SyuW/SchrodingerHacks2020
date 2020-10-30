@@ -10,6 +10,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import basic_greenhouse_model as gmodel
+from molecular_view import MolecularView
 
 # This is the class which inherits from the application window object
 # and modifies it so that
@@ -231,6 +232,11 @@ class MainWindow(QMainWindow):
         self.reflectedSurfaceFlux.setGeometry((self.sunWidth / 4) + (self.width * 0.68),
                                                 (self.sunHeight / 4) + (self.height * 0.25),
                                                 self.width * 0.18, self.height * 0.3)
+
+    # Method for running molecular visualization; spawn another thread
+    def create_molecular_view(self):
+        mview = MolecularView()
+        mview.start_animation_loop()
 
 # main() runs at program initialization, sets up the application window objects handle
 # executes them
