@@ -9,8 +9,7 @@ import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-
-from threading import Thread
+import basic_greenhouse_model as gmodel
 
 # This is the class which inherits from the application window object
 # and modifies it so that
@@ -36,30 +35,37 @@ class MainWindow(QMainWindow):
     # setupUI() initializes all the required UI elemets and sets their geometry accordingly
     def setupUI(self):
         self.setCentralWidget(QWidget())
-
         self.EarthViewSetup()
         self.setupFluxLines()
-        self.buttonSetup()
         self.sliderSetup()
 
         self.resize(self.width, self.height)
 
     # This updates the UI elements to scale wtih the window size
     def updateUI(self):
+        self.width, self.height = self.getScreenSize()
+        self.albedoValue = self.albedoSlider.value()
+        self.emissivityValue = self.emissivitySlider.value()
+        self.T_s, self.T_a = gmodel.run(self.albedoValue, self.emissivityValue)
+
+        self.updateSlider()
         self.updateEarthView()
         self.updateFluxLines()
-        self.updateSlider()
 
     def updateEarthView(self):
         sunWidthScale = 0.4
         sunHeightScale = 0.35
-        self.width, self.height = self.getScreenSize()
         self.sunWidth = sunWidthScale * min(self.width, self.height)
         self.sunHeight = sunHeightScale * min(self.width, self.height)
 
         self.EarthLabel.setGeometry(QRect(0, 0, self.width, self.height))
         self.SunLabel.setGeometry(QRect(-self.sunWidth / 2, -self.sunHeight / 2,
                                         self.sunWidth, self.sunHeight))
+
+
+
+        self.EarthTempLabel.setGeometry(0, 0, 100, 50)
+        self.AtmosTempLabel.setGeometry(0, 50, 100, 50)
 
     # returns the length and width of the current window size
     def getScreenSize(self):
@@ -72,22 +78,25 @@ class MainWindow(QMainWindow):
         self.sunHeight = sunHeightScale * min(self.width, self.height)
 
         self.EarthLabel = QLabel(self)
-        self.EarthLabel.setPixmap(QPixmap("EarthDrawn-1.png"))
+        self.EarthLabel.setPixmap(QPixmap("EarthDrawn.png"))
         self.EarthLabel.setScaledContents(True)
 
         self.SunLabel = QLabel(self)
         self.SunLabel.setPixmap(QPixmap("SunDrawn.png"))
         self.SunLabel.setScaledContents(True)
 
+        self.EarthTempLabel = QLabel(self)
+        self.AtmosTempLabel = QLabel(self)
+
     def sliderSetup(self):
         # These are the values required by the albedo and emissivity sliders
         albedo_step = 0.05
         self.albedo_scale = 100
-        start_albedo = 0
+        start_albedo = 0.3
 
         emissivity_step = 0.05
         self.emissivity_scale = 100
-        start_emissivity = 0
+        start_emissivity = 0.5
 
         # sets up all the sliders in the scene
         self.albedoSlider = QSlider(self)
@@ -97,6 +106,7 @@ class MainWindow(QMainWindow):
         self.albedoSlider.setOrientation(Qt.Horizontal)
         self.albedoSlider.setSliderPosition(start_albedo)
 
+
         self.emissivitySlider = QSlider(self)
         self.emissivitySlider.setMinimum(0)
         self.emissivitySlider.setMaximum(100)
@@ -104,23 +114,13 @@ class MainWindow(QMainWindow):
         self.emissivitySlider.setOrientation(Qt.Horizontal)
         self.emissivitySlider.setSliderPosition(start_albedo)
 
+
         # sets up all text for the slider in the scene
         self.albedoLabel = QLabel(self)
         self.emissivityLabel = QLabel(self)
 
-    def buttonSetup(self):
-        self.visu_button = QPushButton("money", self)
-        self.visu_button.setGeometry(1380, 340, 50, 30)
-        self.visu_button.clicked.connect(self.runVisualization)
-
-    def runVisualization(self):
-        print("lol")
 
     def updateSlider(self):
-        # updates the values of the sliders as stored in memory
-        self.albedoValue = self.albedoSlider.value()
-        self.emissivityValue = self.emissivitySlider.value()
-
         # general constants used by all sliders
         slider_width = 200
         slider_height = 20
@@ -183,28 +183,45 @@ class MainWindow(QMainWindow):
         self.reflectedSurfaceFlux.setPixmap(linedown)
         self.reflectedSurfaceFlux.setScaledContents(True)
 
-
     def updateFluxLines(self):
+        opacity_full = QGraphicsOpacityEffect()
+        opacity_albedo = QGraphicsOpacityEffect()
+        opacity_albedo_left = QGraphicsOpacityEffect()
+        opacity_emissivity = QGraphicsOpacityEffect()
+        opacity_emissivity_trans = QGraphicsOpacityEffect()
+        opacity_emissivity_refl = QGraphicsOpacityEffect()
 
+        opacity_full.setOpacity(1)
+        opacity_albedo.setOpacity(self.albedoValue / (4 * self.albedo_scale))
+        opacity_albedo_left.setOpacity(1 - (self.albedoValue / (4 * self.albedo_scale)))
+        opacity_emissivity.setOpacity(1)
+        opacity_emissivity_trans.setOpacity(1)
+        opacity_emissivity_refl.setOpacity(1)
 
+        self.incidentSunFlux.setGraphicsEffect(opacity_full)
         self.incidentSunFlux.setGeometry((self.sunWidth / 4), (self.sunHeight / 4),
                                          self.width * 0.14, self.height * 0.25)
 
+        self.reflectedSunFlux.setGraphicsEffect(opacity_albedo)
         self.reflectedSunFlux.setGeometry((self.sunWidth / 4) + (self.width * 0.14),
                                           (self.sunHeight / 4), self.width * 0.14, self.height * 0.25)
 
+        self.transmittedSunFlux.setGraphicsEffect(opacity_albedo_left)
         self.transmittedSunFlux.setGeometry((self.sunWidth / 4) + (self.width * 0.14),
                                             (self.sunHeight / 4) + (self.height * 0.25),
                                             self.width * 0.18, self.height * 0.3)
 
+        self.surfaceEmittedFlux.setGraphicsEffect(opacity_emissivity)
         self.surfaceEmittedFlux.setGeometry((self.sunWidth / 4) + (self.width * 0.5),
                                             (self.sunHeight / 4) + (self.height * 0.25),
                                             self.width * 0.18, self.height * 0.3)
 
+        self.transmittedSurfaceFlux.setGraphicsEffect(opacity_emissivity_trans)
         self.transmittedSurfaceFlux.setGeometry((self.sunWidth / 4) + (self.width * 0.68),
                                                 (self.sunHeight / 4) - (self.height * 0.05),
                                                 self.width * 0.18, self.height * 0.3)
 
+        self.reflectedSurfaceFlux.setGraphicsEffect(opacity_emissivity_refl)
         self.reflectedSurfaceFlux.setGeometry((self.sunWidth / 4) + (self.width * 0.68),
                                                 (self.sunHeight / 4) + (self.height * 0.25),
                                                 self.width * 0.18, self.height * 0.3)
