@@ -40,7 +40,10 @@ def run(albedo, emv):
     greenhouse_flux = emv * sb * T_a ** 4
     planetary_flux = (1 - emv)*sb*T_s**4 + emv*sb*T_a**4
 
+    perc_green = solar_flux / greenhouse_flux
+    perc_planet = solar_flux / planetary_flux
+
     # Percentages should be roughly 100, 115, 45, 70 as per the wikipedia article for emv =
     # print(np.array([solar_flux, surface_flux, greenhouse_flux, planetary_flux]) * (100 / solar_flux))
 
-    return T_s, T_a
+    return T_s, T_a, perc_green, perc_planet
