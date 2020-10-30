@@ -16,8 +16,8 @@ Date: October 29, 2020
 # constants
 S_c = 1366 # Solar constant [W * m^(-2)]
 sb = 5.67 * 10 ** (-8)
-albedo = 0.3
-emv = 0.5 #emissivity
+albedo_def = 0.3
+emv_def = 0.5 #emissivity
 # From wikipedia
 greenhouse_contributions = {1: 0.58,
                             2: 0.26,
@@ -25,7 +25,7 @@ greenhouse_contributions = {1: 0.58,
                             4: 0.07}
 
 
-def run():
+def run(albedo, emv):
     emv_factor = 2 / (2 - emv)
     T_eff = (S_c*(1-albedo)/(4*sb)) ** 0.25
 
@@ -43,4 +43,4 @@ def run():
     # Percentages should be roughly 100, 115, 45, 70 as per the wikipedia article for emv =
     # print(np.array([solar_flux, surface_flux, greenhouse_flux, planetary_flux]) * (100 / solar_flux))
 
-    return T_s, T_a, albedo, emv
+    return T_s, T_a
