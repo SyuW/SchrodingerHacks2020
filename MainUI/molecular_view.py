@@ -28,7 +28,7 @@ class Photon(Molecule):
 
     # Probability of absorption dependent on emissivity of atmosphere
     def determine_absorption(self):
-        self.got_absorbed = bool(np.random.binomial(n=1, p=basic_greenhouse_model.emv))
+        self.got_absorbed = bool(np.random.binomial(n=1, p=basic_greenhouse_model.emv_def))
 
     # Override inherited method from Molecule class
     # I know shadowing is bad, but this made my life much easier
