@@ -46,7 +46,11 @@ class MainWindow(QMainWindow):
         self.width, self.height = self.getScreenSize()
         self.albedoValue = self.albedoSlider.value()
         self.emissivityValue = self.emissivitySlider.value()
-        self.T_s, self.T_a = gmodel.run(self.albedoValue, self.emissivityValue)
+        self.T_s, self.T_a, self.green_perc, self.planet_perc = gmodel.run((self.albedoValue / self.albedo_scale),
+                                                                          (self.emissivityValue / self.emissivity_scale))
+
+        #print(f"Atmosphere Temp: {self.T_a - 273.15}")
+        #print(f"Surface Temp: {self.T_s - 273.15}")
 
         self.updateSlider()
         self.updateEarthView()
@@ -96,7 +100,7 @@ class MainWindow(QMainWindow):
 
         emissivity_step = 0.05
         self.emissivity_scale = 100
-        start_emissivity = 0.5 * self.emissivity_scale
+        start_emissivity = 0.75 * self.emissivity_scale
 
         # sets up all the sliders in the scene
         self.albedoSlider = QSlider(self)
@@ -192,11 +196,13 @@ class MainWindow(QMainWindow):
         opacity_emissivity_refl = QGraphicsOpacityEffect()
 
         opacity_full.setOpacity(1)
-        opacity_albedo.setOpacity(self.albedoValue / (4 * self.albedo_scale))
-        opacity_albedo_left.setOpacity(1 - (self.albedoValue / (4 * self.albedo_scale)))
+        opacity_albedo.setOpacity(self.albedoValue / self.albedo_scale)
+        opacity_albedo_left.setOpacity((1 - (self.albedoValue / self.albedo_scale)))
         opacity_emissivity.setOpacity(1)
-        opacity_emissivity_trans.setOpacity((self.emissivityValue / self.emissivity_scale))
-        opacity_emissivity_refl.setOpacity(1 - (self.emissivityValue / self.emissivity_scale))
+        print(f"Reflected: {self.green_perc}")
+        print(f"Transmitted: {self.planet_perc}")
+        opacity_emissivity_refl.setOpacity(self.green_perc)
+        opacity_emissivity_trans.setOpacity(self.planet_perc)
 
         self.incidentSunFlux.setGraphicsEffect(opacity_full)
         self.incidentSunFlux.setGeometry((self.sunWidth / 4), (self.sunHeight / 4),
