@@ -1,5 +1,5 @@
 """
-This is the main IU file for Team 17B's Schrodinger's Hack Project 2020.
+This is the main UI file for Team 17B's Schrodinger's Hack Project 2020.
 
 Author: Kondapuram Aditya Seshadri, Saral Shah
 Date: October 29, 2020
@@ -52,9 +52,6 @@ class MainWindow(QMainWindow):
         self.emissivityValue = self.emissivitySlider.value()
         self.T_s, self.T_a, self.green_perc, self.planet_perc = gmodel.run((self.albedoValue / self.albedo_scale),
                                                                           (self.emissivityValue / self.emissivity_scale))
-
-        #print(f"Atmosphere Temp: {self.T_a - 273.15}")
-        #print(f"Surface Temp: {self.T_s - 273.15}")
 
         self.updateSlider()
         self.updateEarthView()
