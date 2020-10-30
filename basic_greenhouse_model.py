@@ -25,7 +25,7 @@ greenhouse_contributions = {1: 0.58,
                             4: 0.07}
 
 
-def main():
+def run():
     emv_factor = 2 / (2 - emv)
     T_eff = (S_c*(1-albedo)/(4*sb)) ** 0.25
 
@@ -41,11 +41,6 @@ def main():
     planetary_flux = (1 - emv)*sb*T_s**4 + emv*sb*T_a**4
 
     # Percentages should be roughly 100, 115, 45, 70 as per the wikipedia article for emv =
-    print(np.array([solar_flux, surface_flux, greenhouse_flux, planetary_flux]) * (100 / solar_flux))
+    # print(np.array([solar_flux, surface_flux, greenhouse_flux, planetary_flux]) * (100 / solar_flux))
 
-    return T_s
-
-
-if __name__ == "__main__":
-   r = main()
-   print(r - 273.15)
+    return T_s, T_a, albedo, emv
