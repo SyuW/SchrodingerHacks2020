@@ -39,6 +39,7 @@ class MainWindow(QMainWindow):
         self.setupFluxLines()
         self.sliderSetup()
 
+        self.setWindowTitle("Interactive Climate Model")
         self.resize(self.width, self.height)
 
     # This updates the UI elements to scale wtih the window size
@@ -66,10 +67,11 @@ class MainWindow(QMainWindow):
         self.SunLabel.setGeometry(QRect(-self.sunWidth / 2, -self.sunHeight / 2,
                                         self.sunWidth, self.sunHeight))
 
+        self.EarthTempLabel.setGeometry(self.width / 2 - 100, 0.9 * self.height, 200, 25)
+        self.AtmosTempLabel.setGeometry(self.width / 2 - 100, 0.5 * self.height, 200, 25)
 
-
-        self.EarthTempLabel.setGeometry(0, 0, 100, 50)
-        self.AtmosTempLabel.setGeometry(0, 50, 100, 50)
+        self.EarthTempLabel.setText(f"Surface Temperature: {self.T_s}")
+        self.AtmosTempLabel.setText(f"Atmosphere Temperature: {self.T_a}")
 
     # returns the length and width of the current window size
     def getScreenSize(self):
