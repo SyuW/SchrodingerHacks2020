@@ -50,8 +50,8 @@ class MainWindow(QMainWindow):
         self.width, self.height = self.getScreenSize()
         self.albedoValue = self.albedoSlider.value()
         self.emissivityValue = self.emissivitySlider.value()
-        self.T_s, self.T_a, self.green_perc, self.planet_perc = gmodel.run((self.albedoValue / self.albedo_scale),
-                                                                          (self.emissivityValue / self.emissivity_scale))
+        self.T_s, self.T_a, self.green_perc, self.planet_perc, self.surface_perc = gmodel.run((self.albedoValue / self.albedo_scale),
+                                                                                   (self.emissivityValue / self.emissivity_scale))
 
         #print(f"Atmosphere Temp: {self.T_a - 273.15}")
         #print(f"Surface Temp: {self.T_s - 273.15}")
@@ -73,8 +73,8 @@ class MainWindow(QMainWindow):
         self.EarthTempLabel.setGeometry(self.width / 2 - 145, 0.9 * self.height, 200, 45)
         self.AtmosTempLabel.setGeometry(self.width / 2 - 135, 0.45 * self.height, 200, 45)
 
-        self.EarthTempLabel.setText("Surface Temperature: %g\u2103" % round(self.T_s - 273.15, 1))
-        self.AtmosTempLabel.setText(f"Air Temperature: %g\u2103" % round(self.T_a - 273.15, 1))
+        self.EarthTempLabel.setText("Surface Temp: %g\u2103" % round(self.T_s - 273.15, 1))
+        self.AtmosTempLabel.setText(f"Air Temp: %g\u2103" % round(self.T_a - 273.15, 1))
 
     # returns the length and width of the current window size
     def getScreenSize(self):
@@ -200,7 +200,7 @@ class MainWindow(QMainWindow):
         opacity_full.setOpacity(1)
         opacity_albedo.setOpacity(self.albedoValue / self.albedo_scale)
         opacity_albedo_left.setOpacity((1 - (self.albedoValue / self.albedo_scale)))
-        opacity_emissivity.setOpacity(1)
+        opacity_emissivity.setOpacity(self.surface_perc)
         opacity_emissivity_refl.setOpacity(self.green_perc)
         opacity_emissivity_trans.setOpacity(self.planet_perc)
 
