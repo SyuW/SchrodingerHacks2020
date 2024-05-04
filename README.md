@@ -1,2 +1,2 @@
-# SchrodingerHacks2020
-For Team 17B
+# Interactive Greenhouse Model
+Team 17B's project in Schrodinger's Hack 2020
